@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Working Days Calculator</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom font for a clean look */
+        body {
+            font-family: "Inter", sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen flex items-center justify-center p-4">
+    <div class="bg-white p-8 rounded-xl shadow-2xl max-w-md w-full text-center border border-blue-200">
+        <h1 class="text-4xl font-extrabold text-gray-900 mb-6">
+            Working Days Until August 31st
+        </h1>
+        <p class="text-lg text-gray-700 mb-8">
+            Let's find out how many working days are left!
+        </p>
+
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8">
+            <p class="text-xl font-semibold text-blue-800 mb-2">
+                Today's Date:
+            </p>
+            <p id="current-date" class="text-2xl font-bold text-blue-900"></p>
+        </div>
+
+        <div class="bg-green-50 border border-green-200 rounded-lg p-6">
+            <p class="text-xl font-semibold text-green-800 mb-2">
+                Working Days Remaining:
+            </p>
+            <p id="working-days-count" class="text-5xl font-extrabold text-green-700 animate-pulse">
+                Calculating...
+            </p>
+        </div>
+
+        <p class="text-sm text-gray-500 mt-8">
+            (Excludes Saturdays, Sundays, and UK Bank Holidays)
+        </p>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const currentDateElement = document.getElementById('current-date');
+            const workingDaysCountElement = document.getElementById('working-days-count');
+
+            // Get today's date
+            const today = new Date();
+            today.setHours(0, 0, 0, 0); // Normalize to start of day for accurate comparison
+
+            // Set the target date to August 31st, 2025
+            const targetDate = new Date('2025-08-31T00:00:00'); // Use ISO format for consistency
+            targetDate.setHours(0, 0, 0, 0); // Normalize to start of day
+
+            // Define UK Bank Holidays for 2025 (as Date objects, normalized to start of day)
+            // Note: This list should be updated annually or fetched from an API for real-world accuracy.
+            const ukBankHolidays = [
+                new Date('2025-01-01T00:00:00'), // New Year's Day
+                new Date('2025-04-18T00:00:00'), // Good Friday
+                new Date('2025-04-21T00:00:00'), // Easter Monday
+                new Date('2025-05-05T00:00:00'), // Early May Bank Holiday
+                new Date('2025-05-26T00:00:00'), // Spring Bank Holiday
+                new Date('2025-08-25T00:00:00'), // Summer Bank Holiday
+                new Date('2025-12-25T00:00:00'), // Christmas Day
+                new Date('2025-12-26T00:00:00')  // Boxing Day
+            ].map(date => {
+                date.setHours(0, 0, 0, 0); // Normalize each bank holiday date
+                return date;
+            });
+
+            // Helper function to check if a date is a bank holiday
+            const isBankHoliday = (date) => {
+                return ukBankHolidays.some(holiday => holiday.getTime() === date.getTime());
+            };
+
+            // Display today's date
+            currentDateElement.textContent = today.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+
+            let workingDays = 0;
+            let currentDateIterator = new Date(today); // Start counting from today
+
+            // Loop while the current date is before or equal to the target date
+            // We include the target date itself in the count if it's a working day
+            while (currentDateIterator <= targetDate) {
+                const dayOfWeek = currentDateIterator.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+
+                // Check if it's a weekday (Monday to Friday) AND not a bank holiday
+                if (dayOfWeek !== 0 && dayOfWeek !== 6 && !isBankHoliday(currentDateIterator)) {
+                    workingDays++;
+                }
+
+                // Move to the next day
+                currentDateIterator.setDate(currentDateIterator.getDate() + 1);
+            }
+
+            // Display the calculated working days
+            workingDaysCountElement.textContent = workingDays;
+        });
+    </script>
+</body>
+</html>
